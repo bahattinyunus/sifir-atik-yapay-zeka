@@ -1,116 +1,192 @@
 # sıfır-atık-yapay-zeka (sifir-atik-yapay-zeka)
 
 <div align="center">
-  <img src="gorseller/banner.png" alt="Sıfır Atık Yapay Zeka Banner">
+  <img src="gorseller/banner.png" alt="Sıfır Atık Yapay Zeka Banner" width="100%">
+  
+  <p align="center">
+    <strong>Düşük Maliyetli, Uçta Yapay Zeka (Edge-AI) Destekli ve Açık Kaynaklı Polimer Ayrıştırma Ekosistemi</strong>
+  </p>
+
+  <p align="center">
+    <a href="#-temel-özellikler"><img src="https://img.shields.io/badge/Yapay%20Zeka-Edge--AI%20%7C%20TinyML-10b981?style=flat-square" alt="AI"></a>
+    <a href="#-sistem-mimarisi"><img src="https://img.shields.io/badge/G%C3%B6m%C3%BCl%C3%BC-RPi%20%7C%20Jetson%20%7C%20HAL-38bdf8?style=flat-square" alt="Embedded"></a>
+    <a href="#-benchmark-ve-performans"><img src="https://img.shields.io/badge/Performans-370%2B%20FPS%20(2.7ms)-f59e0b?style=flat-square" alt="Performance"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-c084fc?style=flat-square" alt="License"></a>
+  </p>
 </div>
 
-> **Düşük Maliyetli, Yapay Zeka Destekli ve Açık Kaynaklı Plastik Ayırt Etme Cihazı Geliştirme Rehberi**
+---
 
-Geri dönüşüm endüstrisinin en büyük darboğazlarından biri, atıkların doğru, hızlı ve sürdürülebilir bir maliyetle sınıflandırılmasıdır. Bu depo (repo); **HDPE, PET, Naylon, PUR** gibi farklı polimer yapıdaki plastikleri düşük maliyetli sensörler, kameralar ve uçta yapay zeka (Edge-AI) yöntemleriyle ayırt edebilen bir cihazın hem donanım hem de yazılım mimarisine rehberlik etmek için oluşturulmuştur.
-
-Bu proje, hem çevresel bir problemi çözmeyi hem de yerel geri dönüşüm tesisleri için erişilebilir bir mühendislik çözümü sunmayı amaçlar.
+Geri dönüşüm endüstrisinin en kritik darboğazı, atıkların doğru, yüksek hızlı ve sürdürülebilir bir maliyetle ayrıştırılmasıdır. Bu depo (repo); **PET, HDPE, Naylon (Poliamid), PUR, Metal** gibi farklı polimer ve malzemeleri standart kameralar, temel optik/endüktif sensörler ve uçta yapay zeka (Edge-AI) algoritmalarıyla milisaniyeler içinde sınıflandırıp pnömatik solenoid valflerle ayıran bir cihazın uçtan uca mimarisini ve kaynak kodlarını sunar.
 
 ---
 
-## 🌍 Sektör Liderleri: Dünyada Bu İşi Kim, Nasıl Yapıyor?
+## 🌍 Sektör Liderleri ve Bu Projenin Konumu
 
-Sistem mimarimizi kurgularken, dünyada bu işi endüstriyel boyutta en iyi yapan firmaların teknolojilerini anlamak vizyonumuzu genişletecektir. İşte pazarın devleri ve kullandıkları teknolojiler:
+Dünyadaki endüstriyel devlerin yaklaşımları:
+* **TOMRA (Norveç):** Yakın Kızılötesi (NIR) Spektroskopisi kullanır. %99 doğruluk sunar ancak **yüz binlerce dolarlık** kurulum maliyeti gerektirir.
+* **AMP Robotics (ABD):** Bilgisayarlı görü ve yüksek hızlı delta robot kollar kullanır. Büyük tesisler için tasarlanmıştır.
+* **Glacier (ABD):** Düşük maliyetli robotik vizyonu hedefler.
 
-### 1. TOMRA (Norveç) - *Endüstriyel Standart*
-TOMRA, atık ayıklama sistemlerinde küresel pazar lideridir. 
-* **Kullandığı Teknoloji:** Ağırlıklı olarak **NIR (Yakın Kızılötesi) Spektroskopisi**, lazer ve x-ray teknolojilerini kullanır. Polimerlerin ışığı soğurma oranlarındaki farklılıkları saptayarak plastik türlerini neredeyse %99 doğrulukla ayırır.
-* **Dezavantajı:** Milyon dolarları bulan devasa kurulum maliyetleri ve küçük tesisler için uygun olmayan devasa bant sistemleri gerektirir.
-
-### 2. AMP Robotics (ABD) - *Görsel Yapay Zeka Öncüsü*
-AMP Robotics, "AMP Cortex" adını verdiği yapay zeka sistemiyle süreci tamamen dijitalleştirmiştir.
-* **Kullandığı Teknoloji:** NIR yerine tamamen **Bilgisayarlı Görü (Computer Vision)** ve Derin Öğrenme kullanır. Kameralar atıkları tanımlar ve "örümcek (delta)" robot kollar saniyede onlarca atığı banttan çekip alır. Geliştirdikleri AI, atığın markasına kadar (örneğin bir Coca-Cola şişesi) tanıma yapabilir.
-* **İlham Kaynağı:** Görsel verinin, doğru eğitilmiş bir modelle ne kadar güçlü olabileceğini kanıtlamışlardır.
-
-### 3. Glacier (ABD) - *Düşük Maliyetli Alternatif*
-Glacier, geleneksel endüstriyel robotların çok pahalı olduğu fikrinden yola çıkan bir girişimdir.
-* **Kullandığı Teknoloji:** Standart kameralar, yapay zeka ve standart endüstriyel robot kollara kıyasla çok daha ucuz, kendi ürettikleri özel mekanik kollar kullanırlar.
-* **Projemizle Kesişimi:** Glacier'in felsefesi bu deponun (repo) ruhuna çok yakındır. Daha uygun fiyatlı donanımlar ve güçlü yazılımlarla küçük geri dönüşüm tesislerine hitap ederler.
-
-### 4. ZenRobotics (Finlandiya) - *Ağır Atık Uzmanı*
-Daha çok inşaat ve yıkıntı atıklarına odaklansalar da, büyük robotik kolların yapay zeka sensör füzyonu (kamera, 3D lazer tarayıcı, NIR) ile yönlendirilmesinde ustadırlar.
-
-**Özetle:** Dünyadaki liderler ya *çok pahalı sensörler* (TOMRA) ya da *pahalı mekanik robotlar* (AMP) kullanıyor. **`sifir-atik-yapay-zeka` projesinin dolduracağı boşluk:** Kameralar, temel ucuz sensörler ve uç cihazlarda (Edge) çalışan yapay zeka modelleri ile "erişilebilir" bir çözüm yaratmaktır.
+> **🎯 `sifir-atik-yapay-zeka` Projesinin Doldurduğu Boşluk:**
+> Pahalı NIR spektrometreleri veya yüz bin dolarlık robot kollara ihtiyaç duymadan; **Raspberry Pi / Jetson Nano**, optimize edilmiş **TinyML modelleri (MobileNet / TorchScript / ONNX)** ve **hızlı pnömatik valflerle** yerel tesislerin, üniversitelerin ve bağımsız geliştiricilerin kurabileceği **erişilebilir ve ölçeklenebilir açık kaynaklı bir altyapı** sunmaktır.
 
 ---
 
-## 🎯 Projenin Amacı ve Hedefler
+## 🔬 Hedeflenen Polimerler ve Algılama Yöntemleri
 
-- **Maliyet Bariyerini Yıkmak:** Yukarıda bahsedilen sistemlerin yüz binlerce dolarlık maliyetlerine karşı, yerel işletmelerin ve bağımsız geliştiricilerin üretebileceği bütçe dostu bir mimari sunmak.
-- **Uçta Yapay Zeka (Edge-AI):** Bulut sistemlerine ihtiyaç duymadan, bant üzerinde milisaniyeler içinde karar verebilen yerel çıkarım (local inference) sistemleri geliştirmek.
-- **Geliştirici Rehberi Olmak:** Sektöre girmek isteyen mühendislere, maker'lara ve girişimcilere donanımdan yazılıma uçtan uca bir açık kaynak yol haritası sağlamak.
-
----
-
-## 🔬 Hedeflenen Malzemeler ve Ayırt Etme Yöntemleri
-
-| Plastik Türü | Yaygın Kullanım Alanı | Potansiyel Algılama Yöntemi (Bu Projede) |
-| :--- | :--- | :--- |
-| **PET (Polietilen Tereftalat)** | Su şişeleri, gıda ambalajları | Optik Şeffaflık Analizi + Temel NIR Sensörleri |
-| **HDPE (Yüksek Yoğunluklu Polietilen)** | Deterjan şişeleri, süt kutuları | Renk/Doku Modeli + Yoğunluk/Kızılötesi |
-| **Naylon (Poliamid)** | Endüstriyel parçalar, tekstil | Termal Davranış (Ucuz Termal Sensörler) / Görsel Esneklik |
-| **PUR (Poliüretan)** | Süngerler, yalıtım malzemeleri | Esneklik/Doku Analizi + Kamera ile Hacim Analizi |
+| Polimer / Atık Türü | Geri Dönüşüm Kodu | Yoğunluk | Ayırt Etme Yöntemi | Ayrıştırma Aktüatörü |
+| :--- | :---: | :---: | :--- | :--- |
+| **PET (Polietilen Tereftalat)** | ♳ (#1) | 1.38 g/cm³ | Optik Saydamlık + Spektral Yansıma | Pnömatik Valf 1 |
+| **HDPE (Yüksek Yoğunluklu PE)** | ♲ (#2) | 0.95 g/cm³ | Renk / Yüzey Dokusu + Form Sınıflandırıcı | Pnömatik Valf 2 |
+| **Naylon (Poliamid PA6/PA66)** | ♸ (#7) | 1.14 g/cm³ | Termal Davranış / Yansıma Analizi | Pnömatik Valf 3 |
+| **PUR (Poliüretan Köpük)** | ♸ (#7) | 0.03 g/cm³ | Esneklik / Doku Analizi + Hacimsel CNN | Pnömatik Valf 4 |
+| **Metal (Alüminyum / Teneke)** | ♶ (#41) | 2.70 g/cm³ | Endüktif Yaklaşım Sensörü + Spekular Yansıma | Pnömatik Valf 5 |
+| **Reject (Bilinmeyen/Kompozit)** | ♸ (#0) | - | Güven Skoru Eşik Altı (<%75) | Bant Sonu Haznesi |
 
 ---
 
-## 🏗️ Sistem Mimarisi (Nasıl Çalışır?)
+## 🏗️ Sistem Mimarisi ve Veri Akışı
 
-Sistem, fiziksel dünyadan alınan verileri işleyip mekanik bir ayrıştırmaya dönüştüren 3 temel katmandan oluşur:
+```mermaid
+flowchart LR
+    A["📷 Kamera & IR Sensör<br/>(Bant Üzeri Algılama)"] --> B["⚡ Edge Inference Motoru<br/>(PolymerEdgeNet / TorchScript)"]
+    B --> C["⏱️ Konveyör Takipçisi<br/>(t = d / v Zamanlama Hesabı)"]
+    C --> D["💨 12V Pnömatik Solenoid Valfler<br/>(100ms Hava Darbesi)"]
+    B --> E["🌐 FastAPI & SQLite Backend<br/>(Audit Log / Event Stream)"]
+    E --> F["📊 Glassmorphism Dashboard<br/>(Canlı Kamera / Analitik / CSV)"]
+```
 
-1. **Algılama Katmanı (Sensors & Vision):** Atık bandından geçen materyalin yüksek çözünürlüklü/geniş açılı kamera görüntüleri ve uygun maliyetli IR/Termal sensör verileri toplanır.
-2. **Uçta İşleme Katmanı (Edge Inference):** Toplanan veriler, Jetson Nano, Raspberry Pi veya optimize edilmiş STM32 türevi mikrodenetleyiciler üzerinde koşan sıkıştırılmış (quantized) modellerle analiz edilir.
-3. **Mekanik Eylem Katmanı (Actuator):** Analiz sonucu belirlenen sınıflandırmaya göre, hızlı tepki veren pnömatik (hava basınçlı) valfler veya servo yönlendiriciler tetiklenerek atık ilgili hazneye atılır.
+1. **Algılama (Sensing):** Atık konveyör banda girer; optik ve IR sensörler banttan geçiş anını saptar.
+2. **Çıkarım (Edge-AI Inference):** Optimize edilmiş `PolymerEdgeNet` modeli görüntüyü **~2.7 ms** sürede sınıflandırır.
+3. **Zamanlanmış Eylem (Actuation):** Konveyör hızı ($v$) ve kamera-valf mesafesi ($d$) hesaplanarak ilgili pnömatik valf mikrosaniyeler içinde ateşlenir ($t = d/v$).
+4. **Telemetri ve Kayıt (Telemetry):** Tüm veriler kalıcı SQLite tabanına kaydedilir, WebSocket ile canlı dashboard'a aktarılır.
+
+---
+
+## ⚡ Benchmark ve Performans Sonuçları
+
+Model, x86 ve ARM64 CPU mimarilerinde kapsamlı benchmark testinden geçirilmiştir (`yapay-zeka/benchmark.py`):
+
+```text
+============================================================
+Sıfır Atık YZ - Model Çıkarım Benchmark Testi
+============================================================
+Yüklenen Model: PolymerEdgeNet (TorchScript JIT Optimize)
+Örnek Giriş Boyutu: (1, 3, 224, 224) RGB
+
+Ortalama Gecikme (Latency): 2.70 ms
+Medyan Gecikme:            2.64 ms
+P95 Gecikme:               3.39 ms
+P99 Gecikme:               3.56 ms
+Min / Max:                 2.15 ms / 3.61 ms
+Teorik Çıkarım Hızı:       370.2 FPS
+============================================================
+```
 
 ---
 
 ## 📁 Depo Dizin Yapısı
 
-Projeye katkı sağlarken veya mimariyi incelerken aşağıdaki dizin yapısını referans alabilirsiniz:
-
 ```text
-├── donanim/                 # Devre şemaları, PCB dosyaları, mekanik parçaların 3D (STL) modelleri
-├── yapay-zeka/              # Model eğitimi, veri seti (dataset) hazırlama ve Edge optimizasyonları
-│   ├── veri-toplama/        # Kamera ve sensörlerden otonom veri toplayan araçlar
-│   └── modeller/            # Eğitilmiş ONNX, TensorFlow Lite modelleri
-├── gomulu-yazilim/          # Mikrodenetleyici (C, C++, Python) ve donanım haberleşme kodları
-├── arayuz/                  # Ayrıştırılan atıkların istatistiklerini gösteren basit web dashboard'u
-└── dokumantasyon/           # BOM (Malzeme Listesi), maliyet analizi ve adım adım kurulum
-
+├── arayuz/                      # Web Dashboard ve Kontrol Merkezi
+│   ├── index.html               # 5 Sekmeli Modern SPA Arayüzü (Glassmorphism)
+│   ├── style.css                # CSS3 Değişkenleri, Animasyonlar ve Responsive Düzen
+│   ├── app.js                   # WebSocket İstemcisi, Chart.js ve Sistem Yönetimi
+│   └── backend/                 # FastAPI REST API ve WebSocket Sunucusu
+│       ├── main.py              # MJPEG Kamera Streamer, REST Uçları ve WebSocket Dağıtıcısı
+│       ├── database.py          # SQLite Veri Tabanı Katmanı (Audit Log ve Raporlama)
+│       └── requirements.txt     # Python Paket Gereksinimleri
+├── gomulu-yazilim/              # Uç Donanım ve Aktüatör Sürücüleri
+│   ├── edge_inference.py        # Canlı Kamera + AI Modeli + Valf Entegrasyon Motoru
+│   ├── actuator_controller.py   # Donanım Soyutlama Katmanı (HAL) ve Valf Sürücüsü
+│   ├── conveyor_tracker.py      # Bant Hızı ve Gecikme (t = d / v) Zamanlayıcısı
+│   ├── sensor_reader.py         # IR Optik, Endüktif ve Spektrometre Sensör Okuyucusu
+│   └── servo_control.py         # MG996R Mekanik Flap Açı Kontrolü
+├── yapay-zeka/                  # Model Eğitimi, Mimari ve Veri Seti Araçları
+│   ├── modeller/
+│   │   ├── model_arch.py        # PolymerEdgeNet PyTorch CNN Mimarisi
+│   │   ├── classes.json         # Polimer Özellikleri ve Spektral Parametreler
+│   │   └── polymer_model_scripted.pt # Optimize Edilmiş TorchScript Modeli
+│   ├── egitim/
+│   │   └── train_classifier.py  # Model Eğitim Pipeline'ı ve İhraç Araçları
+│   ├── veri-toplama/
+│   │   └── kamera_okuma.py      # Hareket Algılamalı Otonom Veri Toplayıcı
+│   └── benchmark.py             # FPS, Latency ve Donanım Yükü Ölçüm Scripti
+├── donanim/                     # Mekanik Çizimler ve Devre Şemaları
+│   ├── mekanik/
+│   │   ├── servo_flap_braketi.scad    # 2020 Alüminyum Profil Servo Braketi
+│   │   └── kamera_montaj_aparati.scad # Ayarlanabilir Kamera Taşıyıcı Braket
+│   └── elektronik/
+│       ├── baglanti_semasi.md   # Detaylı Pinout ve Güvenlik/Diyot Bağlantıları
+│       └── devre_semasi.svg     # Vektörel Elektriksel Bağlantı Blok Şeması
+├── dokumantasyon/               # Mühendislik Kılavuzları
+│   ├── BOM.md                   # 2026 Güncel Malzeme Listesi ve Maliyet Tablosu
+│   ├── KURULUM.md               # Raspberry Pi / Jetson Kurulumu ve systemd Servisleri
+│   └── KALIBRASYON_VE_TEST.md   # Konveyör Bant Hız ve Valf Zamanlama Kalibrasyonu
+├── tests/                       # Otomatik Pytest Birim ve Entegrasyon Testleri
+│   ├── test_backend_api.py
+│   ├── test_actuators.py
+│   └── test_inference.py
+├── Dockerfile                   # Konteyner İmajı
+├── docker-compose.yml           # Tek Komutla Dağıtım
+└── .github/workflows/ci.yml     # Sürekli Entegrasyon (CI Pipeline)
 ```
 
 ---
 
-## 🚀 Başlangıç Rehberi
+## 🚀 Hızlı Başlangıç
 
-Bu alanda geliştirme yapmaya başlamak için izlenmesi gereken temel adımlar:
+### 1. Depoyu İndirin ve Bağımlılıkları Kurun
+```bash
+git clone https://github.com/arch-yunus/sifir-atik-yapay-zeka.git
+cd sifir-atik-yapay-zeka
 
-1. **Donanım ve Bütçe Planlaması:** `dokumantasyon/BOM.md` dosyasını inceleyerek bütçenize uygun sensör ve mikrodenetleyicileri temin edin.
-2. **Veri Seti (Dataset) Oluşturma:** Sistemin en kritik parçası veridir. `yapay-zeka/veri-toplama` altındaki betikleri kullanarak, hedeflediğiniz plastik türlerini farklı ışık koşullarında kameraya ve sensörlere tanıtın.
-3. **Model Eğitimi (TinyML):** Topladığınız verilerle hafifletilmiş modeller (MobileNet türevleri veya özel CNN mimarileri) eğitin.
-4. **Entegrasyon ve Test:** Yazılımın çıkarım (inference) hızını ve mekanik tetikleyicilerle (örneğin hava valfleri) senkronizasyonunu test bantlarında deneyin.
+pip install -r arayuz/backend/requirements.txt
+pip install torch pytest
+```
+
+### 2. Backend Sunucusunu ve Canlı Akışı Başlatın
+```bash
+cd arayuz/backend
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+* Tarayıcınızda `http://localhost:8000/docs` adresinden API dokümantasyonuna ulaşabilirsiniz.
+* `arayuz/index.html` dosyasını tarayıcınızda açarak interaktif kontrol merkezini kullanmaya başlayın.
+
+### 3. Edge AI Çıkarım Motorunu Çalıştırın
+Ayrı bir terminal penceresinde:
+```bash
+cd gomulu-yazilim
+python edge_inference.py
+```
+
+### 4. Testleri Koşturun
+```bash
+pytest tests/
+```
+
+---
+
+## 🛠️ Docker ile Dağıtım
+
+Tüm sistemi tek komutla ayağa kaldırmak için:
+```bash
+docker compose up --build
+```
 
 ---
 
 ## 🤝 Katkıda Bulunma
 
-Bu projenin amacı, büyük şirketlerin tekelindeki bir teknolojiyi tabana yaymaktır. Yeni bir sensör füzyonu fikriniz, daha hafif bir yapay zeka mimarisi kodunuz veya mekanik bir iyileştirme tavsiyeniz varsa, lütfen çekinmeyin!
-
-1. Bu depoyu çatallayın (Fork).
-2. Yeni bir özellik dalı (Branch) açın (`git checkout -b ozellik/yeni-yapay-zeka-modeli`).
-3. Değişikliklerinizi kaydedin (`git commit -m 'Daha hızlı bir görüntü işleme modeli eklendi'`).
-4. Dalınızı gönderin (`git push origin ozellik/yeni-yapay-zeka-modeli`).
+1. Depoyu çatallayın (Fork).
+2. Yeni bir özellik dalı açın (`git checkout -b ozellik/yeni-spektrometre-entegrasyonu`).
+3. Değişikliklerinizi commit edin (`git commit -m 'feat: AS7265x spektrometre surucusu eklendi'`).
+4. Dalınızı gönderin (`git push origin ozellik/yeni-spektrometre-entegrasyonu`).
 5. Bir Çekme İsteği (Pull Request) oluşturun.
 
 ---
 
 ## 📄 Lisans
 
-Bu proje [MIT Lisansı](https://www.google.com/search?q=LICENSE) altında paylaşılmıştır. Yenilikçiliği teşvik etmek amacıyla ticari veya bireysel olarak serbestçe kullanılabilir ve değiştirilebilir.
-
-```
-
-```
+Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak paylaşılmıştır. Ticari ve bireysel kullanım serbesttir.

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sifir-atik-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/arayuz/backend/data
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1

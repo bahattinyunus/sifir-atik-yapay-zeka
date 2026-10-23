@@ -1,0 +1,70 @@
+{
+  "classes": [
+    {
+      "id": 0,
+      "code": "PET",
+      "name": "Polietilen Tereftalat",
+      "recycle_code": 1,
+      "density_g_cm3": 1.38,
+      "melting_point_c": 260,
+      "color_hex": "#38bdf8",
+      "sorting_method": "Optik Saydamlık + 1600nm NIR Spektroskopisi",
+      "typical_uses": "Su şişeleri, meşrubat kapları, gıda ambalajları"
+    },
+    {
+      "id": 1,
+      "code": "HDPE",
+      "name": "Yüksek Yoğunluklu Polietilen",
+      "recycle_code": 2,
+      "density_g_cm3": 0.95,
+      "melting_point_c": 130,
+      "color_hex": "#f59e0b",
+      "sorting_method": "Renk/Doku Analizi + 1720nm NIR Spektrumu",
+      "typical_uses": "Şampuan/deterjan bidonları, borular, süt şişeleri"
+    },
+    {
+      "id": 2,
+      "code": "Naylon",
+      "name": "Poliamid (PA6 / PA66)",
+      "recycle_code": 7,
+      "density_g_cm3": 1.14,
+      "melting_point_c": 220,
+      "color_hex": "#c084fc",
+      "sorting_method": "Termal Yanıt + 1500nm Amid Soğurma Piki",
+      "typical_uses": "Tekstil iplikleri, otomotiv parçaları, dişliler, misina"
+    },
+    {
+      "id": 3,
+      "code": "PUR",
+      "name": "Poliüretan Köpük / Elastomer",
+      "recycle_code": 7,
+      "density_g_cm3": 0.03,
+      "melting_point_c": 200,
+      "color_hex": "#2dd4bf",
+      "sorting_method": "Hacim/Esneklik Analizi + Dokusal CNN",
+      "typical_uses": "Süngerler, yalıtım panelleri, conta ve ayakkabı tabanı"
+    },
+    {
+      "id": 4,
+      "code": "Metal",
+      "name": "Alüminyum ve Çelik Kutu",
+      "recycle_code": 41,
+      "density_g_cm3": 2.70,
+      "melting_point_c": 660,
+      "color_hex": "#94a3b8",
+      "sorting_method": "Endüktif Yaklaşım Sensörü + Yansıma Modeli",
+      "typical_uses": "Meşrubat tenekeleri, konserve kutuları, folyolar"
+    },
+    {
+      "id": 5,
+      "code": "Reject",
+      "name": "Tanımlanamayan / Kompozit Atık",
+      "recycle_code": 0,
+      "density_g_cm3": 0.0,
+      "melting_point_c": 0,
+      "color_hex": "#ef4444",
+      "sorting_method": "Düşük Güven Skoru (<%75) veya Bilinmeyen Yapı",
+      "typical_uses": "Geri dönüşüm bandı sonundaki ayrıştırılmamış artık haznesi"
+    }
+  ]
+}

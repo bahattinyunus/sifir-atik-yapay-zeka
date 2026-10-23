@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="boxRpi" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="550" fill="url(#bg)" rx="12"/>
+
+  <!-- Başlık -->
+  <text x="450" y="40" font-family="'Inter', sans-serif" font-size="20" font-weight="bold" fill="#38bdf8" text-anchor="middle">
+    SIFIR ATIK YZ - DEVRE VE BAĞLANTI BLOK ŞEMASI
+  </text>
+  <text x="450" y="65" font-family="'Inter', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    Raspberry Pi 4 / Jetson Nano - 5 Kanallı Optokuplörlü Röle &amp; 12V Pnömatik Valfler
+  </text>
+
+  <!-- Raspberry Pi 4 Kutusu -->
+  <rect x="50" y="100" width="220" height="380" rx="10" fill="url(#boxRpi)" stroke="#10b981" stroke-width="2"/>
+  <text x="160" y="130" font-family="'Inter', sans-serif" font-size="16" font-weight="bold" fill="#10b981" text-anchor="middle">
+    Raspberry Pi 4 / 5
+  </text>
+  <text x="160" y="150" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">
+    (Edge-AI Denetleyici)
+  </text>
+
+  <!-- Pinler RPi -->
+  <!-- 5V & GND -->
+  <rect x="220" y="180" width="50" height="20" fill="#ef4444" rx="3"/>
+  <text x="245" y="194" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">5V VCC</text>
+  <rect x="220" y="210" width="50" height="20" fill="#475569" rx="3"/>
+  <text x="245" y="224" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">GND</text>
+
+  <!-- GPIO Out -->
+  <rect x="220" y="250" width="50" height="20" fill="#38bdf8" rx="3"/>
+  <text x="245" y="264" font-family="monospace" font-size="10" fill="#020617" font-weight="bold" text-anchor="middle">GPIO17</text>
+  <rect x="220" y="285" width="50" height="20" fill="#f59e0b" rx="3"/>
+  <text x="245" y="299" font-family="monospace" font-size="10" fill="#020617" font-weight="bold" text-anchor="middle">GPIO27</text>
+  <rect x="220" y="320" width="50" height="20" fill="#c084fc" rx="3"/>
+  <text x="245" y="334" font-family="monospace" font-size="10" fill="#020617" font-weight="bold" text-anchor="middle">GPIO22</text>
+  <rect x="220" y="355" width="50" height="20" fill="#2dd4bf" rx="3"/>
+  <text x="245" y="369" font-family="monospace" font-size="10" fill="#020617" font-weight="bold" text-anchor="middle">GPIO23</text>
+  <rect x="220" y="390" width="50" height="20" fill="#94a3b8" rx="3"/>
+  <text x="245" y="404" font-family="monospace" font-size="10" fill="#020617" font-weight="bold" text-anchor="middle">GPIO24</text>
+
+  <!-- RPi Sensör Girişleri -->
+  <rect x="60" y="420" width="80" height="24" fill="#334155" rx="3"/>
+  <text x="100" y="436" font-family="monospace" font-size="11" fill="#38bdf8" text-anchor="middle">IR (GPIO4)</text>
+
+  <!-- Röle Modülü Kutusu -->
+  <rect x="360" y="140" width="180" height="300" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="450" y="170" font-family="'Inter', sans-serif" font-size="15" font-weight="bold" fill="#38bdf8" text-anchor="middle">
+    5V Röle Modülü
+  </text>
+  <text x="450" y="190" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">
+    (Optokuplör İzolasyonlu)
+  </text>
+
+  <!-- Röle Giriş Pinleri -->
+  <text x="375" y="264" font-family="monospace" font-size="11" fill="#f8fafc">IN 1 (PET)</text>
+  <text x="375" y="299" font-family="monospace" font-size="11" fill="#f8fafc">IN 2 (HDPE)</text>
+  <text x="375" y="334" font-family="monospace" font-size="11" fill="#f8fafc">IN 3 (Naylon)</text>
+  <text x="375" y="369" font-family="monospace" font-size="11" fill="#f8fafc">IN 4 (PUR)</text>
+  <text x="375" y="404" font-family="monospace" font-size="11" fill="#f8fafc">IN 5 (Metal)</text>
+
+  <!-- Bağlantı Çizgileri RPi -> Röle -->
+  <path d="M 270 260 L 360 260" stroke="#38bdf8" stroke-width="2"/>
+  <path d="M 270 295 L 360 295" stroke="#f59e0b" stroke-width="2"/>
+  <path d="M 270 330 L 360 330" stroke="#c084fc" stroke-width="2"/>
+  <path d="M 270 365 L 360 365" stroke="#2dd4bf" stroke-width="2"/>
+  <path d="M 270 400 L 360 400" stroke="#94a3b8" stroke-width="2"/>
+
+  <!-- Harici 12V Güç Kaynağı -->
+  <rect x="650" y="100" width="200" height="70" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+  <text x="750" y="128" font-family="'Inter', sans-serif" font-size="14" font-weight="bold" fill="#f59e0b" text-anchor="middle">
+    Harici 12V 5A SMPS
+  </text>
+  <text x="750" y="148" font-family="'Inter', sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">
+    Endüstriyel Güç Kaynağı
+  </text>
+
+  <!-- 12V Valfler Grubu -->
+  <rect x="650" y="200" width="200" height="240" rx="10" fill="#0f172a" stroke="#ef4444" stroke-width="2"/>
+  <text x="750" y="230" font-family="'Inter', sans-serif" font-size="14" font-weight="bold" fill="#ef4444" text-anchor="middle">
+    12V Solenoid Valfler
+  </text>
+  <text x="750" y="250" font-family="'Inter', sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">
+    (1N4007 Flyback Diyot Korumalı)
+  </text>
+
+  <rect x="670" y="270" width="160" height="24" rx="4" fill="#1e293b"/>
+  <text x="750" y="286" font-family="monospace" font-size="11" fill="#38bdf8" text-anchor="middle">Valf 1: PET Nozulu</text>
+
+  <rect x="670" y="302" width="160" height="24" rx="4" fill="#1e293b"/>
+  <text x="750" y="318" font-family="monospace" font-size="11" fill="#f59e0b" text-anchor="middle">Valf 2: HDPE Nozulu</text>
+
+  <rect x="670" y="334" width="160" height="24" rx="4" fill="#1e293b"/>
+  <text x="750" y="350" font-family="monospace" font-size="11" fill="#c084fc" text-anchor="middle">Valf 3: Naylon Nozulu</text>
+
+  <rect x="670" y="366" width="160" height="24" rx="4" fill="#1e293b"/>
+  <text x="750" y="382" font-family="monospace" font-size="11" fill="#2dd4bf" text-anchor="middle">Valf 4: PUR Nozulu</text>
+
+  <rect x="670" y="398" width="160" height="24" rx="4" fill="#1e293b"/>
+  <text x="750" y="414" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">Valf 5: Metal Nozulu</text>
+
+  <!-- Röle -> Valf Çizgileri -->
+  <path d="M 540 280 L 670 280" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <path d="M 540 312 L 670 312" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <path d="M 540 345 L 670 345" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <path d="M 540 380 L 670 380" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <path d="M 540 410 L 670 410" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+  <!-- Alt Bilgi Notu -->
+  <text x="450" y="515" font-family="'Inter', sans-serif" font-size="11" fill="#64748b" text-anchor="middle">
+    * Ortak GND (Pi GND ve 12V PSU GND) referans voltajı için birleştirilmelidir. Solenoidlere paralel 1N4007 ters diyot şarttır.
+  </text>
+</svg>

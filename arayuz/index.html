@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sıfır Atık YZ - Dashboard</title>
+    <title>Sıfır Atık YZ - Akıllı Polimer Ayrıştırma Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -13,81 +14,332 @@
         <aside class="sidebar">
             <div class="logo-area">
                 <div class="logo-icon">♻️</div>
-                <h1>Sıfır Atık YZ</h1>
+                <div>
+                    <h1>Sıfır Atık YZ</h1>
+                    <span class="sub-version">Edge-AI v2.0</span>
+                </div>
             </div>
+            
             <nav class="nav-menu">
-                <a href="#" class="nav-item active">📊 Dashboard</a>
-                <a href="#" class="nav-item">📷 Canlı Kamera</a>
-                <a href="#" class="nav-item">⚙️ Ayarlar</a>
-                <a href="#" class="nav-item">📚 Raporlar</a>
+                <button class="nav-item active" data-tab="tab-dashboard">
+                    <span class="nav-icon">📊</span> Genel Bakış
+                </button>
+                <button class="nav-item" data-tab="tab-camera">
+                    <span class="nav-icon">📷</span> Canlı Kamera & Bant
+                </button>
+                <button class="nav-item" data-tab="tab-analytics">
+                    <span class="nav-icon">📈</span> Polimer Analitiği
+                </button>
+                <button class="nav-item" data-tab="tab-reports">
+                    <span class="nav-icon">📚</span> Atık Kayıtları & CSV
+                </button>
+                <button class="nav-item" data-tab="tab-settings">
+                    <span class="nav-icon">⚙️</span> Kalibrasyon & Donanım
+                </button>
             </nav>
+
+            <div class="sidebar-footer glass-panel">
+                <div class="status-indicator">
+                    <span class="pulse-dot" id="ws-pulse"></span>
+                    <span id="ws-status-text">Bağlanıyor...</span>
+                </div>
+                <button class="btn-emergency" id="btn-estop" title="Konveyör ve valfleri anında durdur">
+                    🛑 ACİL DURDURMA (E-STOP)
+                </button>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Top Header -->
             <header class="top-header">
                 <div class="header-title">
-                    <h2>Sistem Durumu: <span class="status-online">Aktif</span></h2>
-                    <p class="subtitle">Son Güncelleme: <span id="last-update">Şimdi</span></p>
+                    <div class="title-with-badge">
+                        <h2 id="page-title">Sistem Kontrol Merkezi</h2>
+                        <span class="status-badge" id="system-badge">Aktif - Otonom Mod</span>
+                    </div>
+                    <p class="subtitle">
+                        Son Veri İletimi: <span id="last-update">--:--:--</span> |
+                        Akış Hızı: <span id="ppm-val" class="highlight-txt">0.0</span> Adet/Dk
+                    </p>
                 </div>
-                <div class="user-profile">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="User">
+                
+                <div class="header-actions">
+                    <button class="btn-secondary" id="btn-quick-sim" title="Test için simüle atık oluştur">
+                        ⚡ Simüle Atık Gönder
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Sıfır+Atık&background=10b981&color=fff" alt="Profil">
+                    </div>
                 </div>
             </header>
 
-            <!-- Stats Grid -->
-            <section class="stats-grid">
-                <div class="stat-card glass-panel">
-                    <div class="stat-icon pet">🍾</div>
-                    <div class="stat-info">
-                        <h3>PET Plastik</h3>
-                        <p class="stat-value" id="pet-count">1,245</p>
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <!-- Stats Grid (6 Polimer/Malzeme Türü) -->
+                <div class="stats-grid">
+                    <div class="stat-card glass-panel" data-type="PET">
+                        <div class="stat-icon pet">🍾</div>
+                        <div class="stat-info">
+                            <h3>PET (Polietilen Tereftalat)</h3>
+                            <p class="stat-value" id="pet-count">0</p>
+                            <span class="stat-meta">Valf 1 (Optik NIR)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel" data-type="HDPE">
+                        <div class="stat-icon hdpe">🧴</div>
+                        <div class="stat-info">
+                            <h3>HDPE (Yüksek Yoğunluk)</h3>
+                            <p class="stat-value" id="hdpe-count">0</p>
+                            <span class="stat-meta">Valf 2 (Doku/Renk)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel" data-type="Naylon">
+                        <div class="stat-icon nylon">🧵</div>
+                        <div class="stat-info">
+                            <h3>Naylon (Poliamid PA)</h3>
+                            <p class="stat-value" id="nylon-count">0</p>
+                            <span class="stat-meta">Valf 3 (Termal Yanıt)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel" data-type="PUR">
+                        <div class="stat-icon pur">🧽</div>
+                        <div class="stat-info">
+                            <h3>PUR (Poliüretan Köpük)</h3>
+                            <p class="stat-value" id="pur-count">0</p>
+                            <span class="stat-meta">Valf 4 (Esneklik/Hacim)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel" data-type="Metal">
+                        <div class="stat-icon metal">🥫</div>
+                        <div class="stat-info">
+                            <h3>Alüminyum / Metal</h3>
+                            <p class="stat-value" id="metal-count">0</p>
+                            <span class="stat-meta">Endüktif Sensör</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel" data-type="Reject">
+                        <div class="stat-icon reject">🗑️</div>
+                        <div class="stat-info">
+                            <h3>Reject (Tanımlanamayan)</h3>
+                            <p class="stat-value" id="reject-count">0</p>
+                            <span class="stat-meta">Bant Sonu Haznesi</span>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card glass-panel">
-                    <div class="stat-icon hdpe">🧴</div>
-                    <div class="stat-info">
-                        <h3>HDPE Plastik</h3>
-                        <p class="stat-value" id="hdpe-count">856</p>
+
+                <!-- Dashboard Orta Gövde -->
+                <div class="dashboard-body">
+                    <!-- Canlı Akış Listesi -->
+                    <div class="live-feed glass-panel">
+                        <div class="panel-header">
+                            <h3>🔴 Son Sınıflandırılan Atıklar</h3>
+                            <span class="feed-counter" id="total-feed-counter">Toplam: 0</span>
+                        </div>
+                        <div class="feed-list" id="feed-list">
+                            <!-- Canlı öğeler JS ile dinamik eklenecek -->
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card glass-panel">
-                    <div class="stat-icon metal">🥫</div>
-                    <div class="stat-info">
-                        <h3>Metal</h3>
-                        <p class="stat-value" id="metal-count">342</p>
-                    </div>
-                </div>
-                <div class="stat-card glass-panel">
-                    <div class="stat-icon reject">🗑️</div>
-                    <div class="stat-info">
-                        <h3>Tanımlanamayan</h3>
-                        <p class="stat-value" id="reject-count">89</p>
+
+                    <!-- Verimlilik ve Özet Analiz -->
+                    <div class="dashboard-side">
+                        <div class="efficiency-panel glass-panel">
+                            <h3>⚡ Yapay Zeka Model Doğruluğu</h3>
+                            <div class="circular-progress" id="progress-circle">
+                                <div class="inner-circle">
+                                    <span id="efficiency-value">%94</span>
+                                </div>
+                            </div>
+                            <p class="efficiency-text">Ortalama Model Güveni (Son 1 Saat)</p>
+                        </div>
+
+                        <div class="hardware-mini-panel glass-panel">
+                            <h3>📟 Edge Cihazı Durumu</h3>
+                            <div class="mini-metrics">
+                                <div class="mini-metric">
+                                    <span>CPU Yükü</span>
+                                    <strong id="mini-cpu">-- %</strong>
+                                </div>
+                                <div class="mini-metric">
+                                    <span>RAM Boş</span>
+                                    <strong id="mini-ram">-- MB</strong>
+                                </div>
+                                <div class="mini-metric">
+                                    <span>Bant Hızı</span>
+                                    <strong id="mini-speed">0.35 m/s</strong>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Live Feed & Chart Area -->
-            <section class="dashboard-body">
-                <div class="live-feed glass-panel">
-                    <h3>🔴 Son Tespit Edilenler</h3>
-                    <div class="feed-list" id="feed-list">
-                        <!-- JS ile doldurulacak -->
-                    </div>
-                </div>
-                
-                <div class="efficiency-panel glass-panel">
-                    <h3>⚡ Sistem Verimliliği</h3>
-                    <div class="circular-progress">
-                        <div class="inner-circle">
-                            <span id="efficiency-value">%94</span>
+            <!-- TAB 2: CANLI KAMERA & BANT -->
+            <section id="tab-camera" class="tab-pane">
+                <div class="camera-container glass-panel">
+                    <div class="camera-toolbar">
+                        <div class="camera-title">
+                            <span class="rec-dot"></span>
+                            <h3>Canlı Konveyör Bant AI Görüş Akışı</h3>
+                            <span class="cam-meta" id="cam-resolution">1280x720 @ 30 FPS</span>
+                        </div>
+                        <div class="camera-actions">
+                            <button class="btn-sm" id="btn-refresh-cam">🔄 Yayını Yenile</button>
+                            <button class="btn-sm" id="btn-toggle-roi">🔲 ROI Kutusunu Göster</button>
                         </div>
                     </div>
-                    <p class="efficiency-text">Doğruluk Oranı (Son 1 Saat)</p>
+
+                    <div class="video-wrapper">
+                        <img id="live-stream-img" src="http://localhost:8000/video_feed" alt="Canlı Kamera Akışı" onerror="this.onerror=null; this.src='https://placehold.co/800x450/1e293b/f8fafc?text=Kamera+Baglantisi+Bekleniyor+(Backend+Baslatin)';">
+                        <div class="video-overlay" id="video-overlay">
+                            <div class="ai-hud-tag">Edge AI Modeli: MobileNet-Polymer V2 (Quantized FP16)</div>
+                            <div class="ai-hud-inference" id="hud-inference">Inference: 14.2 ms</div>
+                        </div>
+                    </div>
+
+                    <div class="camera-footer">
+                        <div class="cam-info-pill">
+                            <span class="pill-label">Valf 1 (PET):</span> <span class="pill-status ready">Hazır</span>
+                        </div>
+                        <div class="cam-info-pill">
+                            <span class="pill-label">Valf 2 (HDPE):</span> <span class="pill-status ready">Hazır</span>
+                        </div>
+                        <div class="cam-info-pill">
+                            <span class="pill-label">Valf 3 (Naylon):</span> <span class="pill-status ready">Hazır</span>
+                        </div>
+                        <div class="cam-info-pill">
+                            <span class="pill-label">Valf 4 (PUR):</span> <span class="pill-status ready">Hazır</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: POLİMER ANALİTİĞİ -->
+            <section id="tab-analytics" class="tab-pane">
+                <div class="charts-grid">
+                    <div class="chart-card glass-panel">
+                        <h3>📊 Polimer Türü Ayrıştırma Dağılımı</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-doughnut"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card glass-panel">
+                        <h3>📈 Saatlik Ayrıştırma Hacmi ve Akış</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-hourly"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: ATIK KAYITLARI & RAPORLAR -->
+            <section id="tab-reports" class="tab-pane">
+                <div class="reports-container glass-panel">
+                    <div class="reports-header">
+                        <div>
+                            <h3>📚 Gerçek Zamanlı Atık Kayıt Kütüğü (Audit Log)</h3>
+                            <p class="subtitle">Tüm sınıflandırma ve mekanik ayrıştırma olayları kalıcı SQLite kütüğünde saklanır.</p>
+                        </div>
+                        <div class="reports-buttons">
+                            <button class="btn-primary" id="btn-export-csv">📥 CSV Olarak İndir</button>
+                            <button class="btn-secondary" id="btn-refresh-history">🔄 Listeyi Yenile</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Polimer Türü</th>
+                                    <th>Güven Skoru</th>
+                                    <th>Zaman</th>
+                                    <th>Çıkarım (ms)</th>
+                                    <th>Aktüatör Eylemi</th>
+                                    <th>Veri Kaynağı</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <tr><td colspan="7" class="loading-cell">Veriler yükleniyor...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: KALİBRASYON & SİSTEM AYARLARI -->
+            <section id="tab-settings" class="tab-pane">
+                <div class="settings-grid">
+                    <div class="settings-card glass-panel">
+                        <h3>🛠️ Mekanik ve Konveyör Kalibrasyonu</h3>
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label for="cfg-conveyor-speed">Konveyör Bant Hızı (m/s):</label>
+                                <input type="number" step="0.01" min="0.05" max="2.0" id="cfg-conveyor-speed" class="form-input" value="0.35">
+                                <small>Kamera ile valfler arası mesafeye göre darbe zamanlamasını belirler.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cfg-valve-delay">Valf Gecikme Süresi (ms):</label>
+                                <input type="number" step="10" min="50" max="2000" id="cfg-valve-delay" class="form-input" value="320">
+                                <small>Atığın kamera görüşünden valf nozuluna ulaşma süresi (t = d / v).</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cfg-valve-pulse">Valf Darbe / Püskürtme Süresi (ms):</label>
+                                <input type="number" step="10" min="20" max="500" id="cfg-valve-pulse" class="form-input" value="120">
+                                <small>Solenoid valfin açık kalıp havayı üfleme süresi.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cfg-confidence">Minimum Güven Eşiği (%):</label>
+                                <input type="number" step="1" min="50" max="99" id="cfg-confidence" class="form-input" value="75">
+                                <small>Bu oranın altındaki sınıflandırmalar otomatik Reject haznesine yönlendirilir.</small>
+                            </div>
+
+                            <button type="submit" class="btn-primary" id="btn-save-settings">💾 Ayarları Kaydet ve Uygula</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-card glass-panel">
+                        <h3>🖥️ Donanım Kaynakları & Servisler</h3>
+                        <div class="system-health-list">
+                            <div class="health-item">
+                                <span class="h-name">İşlemci (CPU):</span>
+                                <span class="h-val" id="sys-cpu">-- %</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="h-name">Bellek (RAM):</span>
+                                <span class="h-val" id="sys-ram">-- %</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="h-name">Disk Alanı:</span>
+                                <span class="h-val" id="sys-disk">-- GB</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="h-name">Sistem Çalışma Süresi:</span>
+                                <span class="h-val" id="sys-uptime">--</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="h-name">WebSocket İstemcileri:</span>
+                                <span class="h-val" id="sys-ws">--</span>
+                            </div>
+                        </div>
+
+                        <div class="e-stop-reset-box">
+                            <h4>Acil Durum Yönetimi</h4>
+                            <p>Sistem E-Stop konumuna alınmışsa aktüatörler kilitlenir. Güvenlik doğrulandıktan sonra buradan sıfırlayabilirsiniz:</p>
+                            <button class="btn-secondary" id="btn-reset-estop">✅ E-Stop Sıfırla ve Devam Et</button>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
+
+    <!-- Bildirim Toast Alanı -->
+    <div id="toast-container"></div>
+
     <script src="app.js"></script>
 </body>
 </html>
