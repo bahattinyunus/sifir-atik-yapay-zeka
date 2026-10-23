@@ -139,7 +139,7 @@ Teorik Çıkarım Hızı:       370.2 FPS
 
 ### 1. Depoyu İndirin ve Bağımlılıkları Kurun
 ```bash
-git clone https://github.com/arch-yunus/sifir-atik-yapay-zeka.git
+git clone https://github.com/bahattinyunus/sifir-atik-yapay-zeka.git
 cd sifir-atik-yapay-zeka
 
 pip install -r arayuz/backend/requirements.txt

@@ -17,7 +17,7 @@ Bu kılavuz, sistemi sıfırdan bir **Raspberry Pi 4 / 5**, **NVIDIA Jetson Nano
 
 ### Adım 1: Depoyu Klonlama ve Sanal Ortam (venv)
 ```bash
-git clone https://github.com/arch-yunus/sifir-atik-yapay-zeka.git
+git clone https://github.com/bahattinyunus/sifir-atik-yapay-zeka.git
 cd sifir-atik-yapay-zeka
 
 # Sanal ortam oluşturma ve etkinleştirme
