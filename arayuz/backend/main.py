@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from database import (
     init_db, save_detection, get_stats, get_recent_detections,
     get_hourly_breakdown, get_settings, update_setting, log_event,
-    export_csv_content
+    export_csv_content, get_environmental_impact, get_system_logs
 )
 
 # SQLite veri tabanını başlat
@@ -171,6 +171,16 @@ async def api_update_config(config: ConfigUpdate):
     log_event("CONFIG", f"Ayarlar güncellendi: {data}")
     await manager.broadcast({"event": "config_updated", "config": get_settings()})
     return {"status": "success", "updated": data}
+
+@app.get("/api/environmental-impact")
+async def api_environmental_impact():
+    """Kurtarılan plastik kütlesi, engellenen CO2 salınımı ve tasarruf edilen enerji miktarı."""
+    return get_environmental_impact()
+
+@app.get("/api/logs")
+async def api_system_logs(limit: int = Query(default=30, le=200)):
+    """Sistem olay ve uyarı logları."""
+    return get_system_logs(limit=limit)
 
 @app.get("/api/system-status")
 async def api_system_status():

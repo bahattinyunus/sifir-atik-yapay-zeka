@@ -163,6 +163,58 @@ def log_event(level: str, message: str):
         cursor.execute("INSERT INTO system_logs (level, message) VALUES (?, ?)", (level, message))
         conn.commit()
 
+def get_system_logs(limit: int = 50) -> List[Dict[str, Any]]:
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, level, message, timestamp FROM system_logs ORDER BY id DESC LIMIT ?", (limit,))
+        return [dict(row) for row in cursor.fetchall()]
+
+def get_environmental_impact() -> Dict[str, Any]:
+    """
+    Geri dönüştürülen polimer ve metallerin çevresel tasarruf metriklerini hesaplar.
+    (EPA WARM ve Avrupa Geri Dönüşüm Birliği katsayıları baz alınmıştır).
+    """
+    stats = get_stats()
+    counts = stats.get("counts", {})
+
+    # Ortalama parça ağırlığı (kg) ve tasarruf çarpanları
+    item_weights = {"PET": 0.030, "HDPE": 0.045, "Naylon": 0.025, "PUR": 0.015, "Metal": 0.015}
+    co2_per_kg = {"PET": 1.5, "HDPE": 1.8, "Naylon": 2.3, "PUR": 1.2, "Metal": 9.0}
+    energy_kwh_per_kg = {"PET": 6.0, "HDPE": 7.5, "Naylon": 10.0, "PUR": 4.0, "Metal": 14.0}
+    water_liters_per_kg = 25.0
+
+    total_mass_kg = 0.0
+    total_co2_kg = 0.0
+    total_energy_kwh = 0.0
+
+    by_polymer = {}
+    for poly, count in counts.items():
+        if poly in item_weights:
+            mass = count * item_weights[poly]
+            co2 = mass * co2_per_kg[poly]
+            energy = mass * energy_kwh_per_kg[poly]
+            total_mass_kg += mass
+            total_co2_kg += co2
+            total_energy_kwh += energy
+            by_polymer[poly] = {
+                "count": count,
+                "mass_kg": round(mass, 2),
+                "co2_saved_kg": round(co2, 2),
+                "energy_saved_kwh": round(energy, 2)
+            }
+
+    total_water_liters = total_mass_kg * water_liters_per_kg
+
+    return {
+        "total_items_sorted": sum(counts.get(p, 0) for p in item_weights),
+        "total_mass_kg": round(total_mass_kg, 2),
+        "total_co2_saved_kg": round(total_co2_kg, 2),
+        "total_energy_saved_kwh": round(total_energy_kwh, 2),
+        "total_water_saved_liters": round(total_water_liters, 1),
+        "equivalent_trees_saved": round(total_co2_kg / 21.7, 1), # 1 yetişkin ağaç yılda ~21.7 kg CO2 emer
+        "by_polymer": by_polymer
+    }
+
 def export_csv_content() -> str:
     """CSV formatında tüm kayıtları döner."""
     with get_connection() as conn:

@@ -1,0 +1,23 @@
+# Sıfır Atık YZ - Polimer YOLOv8 Veri Kümesi Yapılandırması
+# Path: yapay-zeka/modeller/dataset.yaml
+
+path: ../dataset
+train: images/train
+val: images/val
+test: images/test
+
+# Sınıflar (Names)
+names:
+  0: PET
+  1: HDPE
+  2: Naylon
+  3: PUR
+  4: Metal
+  5: Reject
+
+# Polimer Detayları
+metadata:
+  version: "2.0.0"
+  description: "Düşük maliyetli konveyör bant polimer ve atık tespit veri seti"
+  author: "bahattinyunus"
+  license: "MIT"

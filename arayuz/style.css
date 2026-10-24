@@ -773,6 +773,143 @@ body {
     line-height: 1.4;
 }
 
+/* TAB: SIMULATOR */
+.sim-container {
+    padding: 1.5rem;
+}
+
+.sim-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.sim-controls-top {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.canvas-wrapper {
+    width: 100%;
+    background: #020617;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: center;
+}
+
+#conveyor-canvas {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+}
+
+.sim-interactive-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 0.85rem 1.25rem;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+}
+
+.sim-bar-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.btn-sim-item {
+    border: 1px solid transparent;
+    padding: 0.45rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+}
+
+.btn-sim-item:hover {
+    transform: scale(1.05);
+}
+
+.btn-sim-item.btn-pet { background: rgba(56, 189, 248, 0.2); color: var(--pet-color); border-color: rgba(56, 189, 248, 0.4); }
+.btn-sim-item.btn-hdpe { background: rgba(245, 158, 11, 0.2); color: var(--hdpe-color); border-color: rgba(245, 158, 11, 0.4); }
+.btn-sim-item.btn-nylon { background: rgba(192, 132, 252, 0.2); color: var(--nylon-color); border-color: rgba(192, 132, 252, 0.4); }
+.btn-sim-item.btn-pur { background: rgba(45, 212, 191, 0.2); color: var(--pur-color); border-color: rgba(45, 212, 191, 0.4); }
+.btn-sim-item.btn-metal { background: rgba(148, 163, 184, 0.2); color: var(--metal-color); border-color: rgba(148, 163, 184, 0.4); }
+
+/* TAB: ÇEVRESEL ETKİ (ECO) */
+.eco-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.eco-card {
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.25s ease;
+}
+
+.eco-card:hover {
+    transform: translateY(-4px);
+}
+
+.eco-icon {
+    font-size: 2.2rem;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.eco-info h4 {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.eco-value {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 0.2rem 0;
+}
+
+.eco-value .unit {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.eco-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.eco-table-container {
+    padding: 1.75rem;
+}
+
+.eco-table-container h3 {
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+}
+
 /* Toast Bildirimleri */
 #toast-container {
     position: fixed;

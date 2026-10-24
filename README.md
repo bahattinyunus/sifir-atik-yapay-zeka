@@ -8,9 +8,10 @@
   </p>
 
   <p align="center">
-    <a href="#-temel-özellikler"><img src="https://img.shields.io/badge/Yapay%20Zeka-Edge--AI%20%7C%20TinyML-10b981?style=flat-square" alt="AI"></a>
-    <a href="#-sistem-mimarisi"><img src="https://img.shields.io/badge/G%C3%B6m%C3%BCl%C3%BC-RPi%20%7C%20Jetson%20%7C%20HAL-38bdf8?style=flat-square" alt="Embedded"></a>
+    <a href="#-temel-özellikler"><img src="https://img.shields.io/badge/Yapay%20Zeka-Edge--AI%20%7C%20TinyML%20%7C%20Tracking-10b981?style=flat-square" alt="AI"></a>
+    <a href="#-sistem-mimarisi"><img src="https://img.shields.io/badge/G%C3%B6m%C3%BCl%C3%BC-RPi%20%7C%20Jetson%20%7C%20PLC%20Serial-38bdf8?style=flat-square" alt="Embedded"></a>
     <a href="#-benchmark-ve-performans"><img src="https://img.shields.io/badge/Performans-370%2B%20FPS%20(2.7ms)-f59e0b?style=flat-square" alt="Performance"></a>
+    <a href="#-çevresel-etki-esg"><img src="https://img.shields.io/badge/ESG-EPA%20WARM%20CO2%20Modeli-2dd4bf?style=flat-square" alt="ESG"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-c084fc?style=flat-square" alt="License"></a>
   </p>
 </div>
@@ -29,7 +30,7 @@ Dünyadaki endüstriyel devlerin yaklaşımları:
 * **Glacier (ABD):** Düşük maliyetli robotik vizyonu hedefler.
 
 > **🎯 `sifir-atik-yapay-zeka` Projesinin Doldurduğu Boşluk:**
-> Pahalı NIR spektrometreleri veya yüz bin dolarlık robot kollara ihtiyaç duymadan; **Raspberry Pi / Jetson Nano**, optimize edilmiş **TinyML modelleri (MobileNet / TorchScript / ONNX)** ve **hızlı pnömatik valflerle** yerel tesislerin, üniversitelerin ve bağımsız geliştiricilerin kurabileceği **erişilebilir ve ölçeklenebilir açık kaynaklı bir altyapı** sunmaktır.
+> Pahalı NIR spektrometreleri veya yüz bin dolarlık robot kollara ihtiyaç duymadan; **Raspberry Pi / Jetson Nano**, optimize edilmiş **TinyML modelleri (PolymerEdgeNet / MultiObjectDetector)**, **Arduino/PLC seri haberleşme köprüsü** ve **hızlı pnömatik valflerle** yerel tesislerin, üniversitelerin ve bağımsız geliştiricilerin kurabileceği **erişilebilir ve ölçeklenebilir açık kaynaklı bir altyapı** sunmaktır.
 
 ---
 
@@ -50,17 +51,18 @@ Dünyadaki endüstriyel devlerin yaklaşımları:
 
 ```mermaid
 flowchart LR
-    A["📷 Kamera & IR Sensör<br/>(Bant Üzeri Algılama)"] --> B["⚡ Edge Inference Motoru<br/>(PolymerEdgeNet / TorchScript)"]
-    B --> C["⏱️ Konveyör Takipçisi<br/>(t = d / v Zamanlama Hesabı)"]
-    C --> D["💨 12V Pnömatik Solenoid Valfler<br/>(100ms Hava Darbesi)"]
-    B --> E["🌐 FastAPI & SQLite Backend<br/>(Audit Log / Event Stream)"]
-    E --> F["📊 Glassmorphism Dashboard<br/>(Canlı Kamera / Analitik / CSV)"]
+    A["📷 Kamera & IR Sensör<br/>(Bant Üzeri Algılama)"] --> B["⚡ Çoklu Nesne Tespiti<br/>(MultiObjectPolymerDetector)"]
+    B --> C["⏱️ Asenkron Valf Kuyruğu<br/>(MultiValveScheduler: t = d / v)"]
+    C --> D["💨 12V Pnömatik Valfler & PLC<br/>(SerialBridge / MOSFET)"]
+    B --> E["🌐 FastAPI & SQLite Backend<br/>(Audit Log / ESG Metrikleri)"]
+    E --> F["📊 Glassmorphism Dashboard<br/>(2D Simülatör / Analitik / CSV)"]
 ```
 
-1. **Algılama (Sensing):** Atık konveyör banda girer; optik ve IR sensörler banttan geçiş anını saptar.
-2. **Çıkarım (Edge-AI Inference):** Optimize edilmiş `PolymerEdgeNet` modeli görüntüyü **~2.7 ms** sürede sınıflandırır.
-3. **Zamanlanmış Eylem (Actuation):** Konveyör hızı ($v$) ve kamera-valf mesafesi ($d$) hesaplanarak ilgili pnömatik valf mikrosaniyeler içinde ateşlenir ($t = d/v$).
-4. **Telemetri ve Kayıt (Telemetry):** Tüm veriler kalıcı SQLite tabanına kaydedilir, WebSocket ile canlı dashboard'a aktarılır.
+1. **Algılama (Sensing):** Atıklar konveyör banda girer; kamera ve IR sensörler banttan geçişi saptar.
+2. **Çıkarım ve Takip (Multi-Object Tracking):** `MultiObjectPolymerDetector` aynı anda akan birden fazla atığı tespit edip her birine benzersiz bir `track_id` atar.
+3. **Zamanlanmış Valf Kuyruğu (Multi-Valve Scheduler):** Her atığın polimer türüne ait valf mesafesine ($d$) göre varış süresi ($t = d / v$) hesaplanarak asenkron heap kuyruğunda zamanlanır.
+4. **Endüstriyel Köprü (Industrial Bridge):** `SerialBridge` veya GPIO HAL üzerinden valfler mikrosaniyeler içinde tetiklenir.
+5. **Telemetri ve ESG (Environmental Impact):** EPA WARM katsayılarıyla kurtarılan kütle ($kg$), engellenen $CO_2$ ($kg$) ve enerji ($kWh$) hesaplanıp dashboard'da canlı sunulur.
 
 ---
 
@@ -90,44 +92,57 @@ Teorik Çıkarım Hızı:       370.2 FPS
 
 ```text
 ├── arayuz/                      # Web Dashboard ve Kontrol Merkezi
-│   ├── index.html               # 5 Sekmeli Modern SPA Arayüzü (Glassmorphism)
-│   ├── style.css                # CSS3 Değişkenleri, Animasyonlar ve Responsive Düzen
-│   ├── app.js                   # WebSocket İstemcisi, Chart.js ve Sistem Yönetimi
+│   ├── index.html               # 7 Sekmeli Modern SPA Arayüzü (ESG, Simülatör, Kamera)
+│   ├── style.css                # CSS3 Değişkenleri, Glassmorphism ve Responsive Düzen
+│   ├── app.js                   # WebSocket İstemcisi, Chart.js ve 2D Canvas Simülatörü
 │   └── backend/                 # FastAPI REST API ve WebSocket Sunucusu
 │       ├── main.py              # MJPEG Kamera Streamer, REST Uçları ve WebSocket Dağıtıcısı
-│       ├── database.py          # SQLite Veri Tabanı Katmanı (Audit Log ve Raporlama)
+│       ├── database.py          # SQLite Veri Tabanı Katmanı (Audit Log ve ESG Raporlama)
 │       └── requirements.txt     # Python Paket Gereksinimleri
 ├── gomulu-yazilim/              # Uç Donanım ve Aktüatör Sürücüleri
 │   ├── edge_inference.py        # Canlı Kamera + AI Modeli + Valf Entegrasyon Motoru
+│   ├── multi_object_tracker.py  # Çoklu Atık Takipçisi ve Asenkron Valf Kuyruğu
+│   ├── serial_bridge.py         # Arduino/STM32/PLC Seri ASCII Protokol Köprüsü
 │   ├── actuator_controller.py   # Donanım Soyutlama Katmanı (HAL) ve Valf Sürücüsü
 │   ├── conveyor_tracker.py      # Bant Hızı ve Gecikme (t = d / v) Zamanlayıcısı
 │   ├── sensor_reader.py         # IR Optik, Endüktif ve Spektrometre Sensör Okuyucusu
 │   └── servo_control.py         # MG996R Mekanik Flap Açı Kontrolü
 ├── yapay-zeka/                  # Model Eğitimi, Mimari ve Veri Seti Araçları
 │   ├── modeller/
+│   │   ├── yolo_detector.py     # Çoklu Nesne Tespiti ve Centroid Takip Motoru
 │   │   ├── model_arch.py        # PolymerEdgeNet PyTorch CNN Mimarisi
 │   │   ├── classes.json         # Polimer Özellikleri ve Spektral Parametreler
+│   │   ├── dataset.yaml         # YOLOv8 Veri Kümesi Yapılandırma Dosyası
 │   │   └── polymer_model_scripted.pt # Optimize Edilmiş TorchScript Modeli
 │   ├── egitim/
 │   │   └── train_classifier.py  # Model Eğitim Pipeline'ı ve İhraç Araçları
 │   ├── veri-toplama/
-│   │   └── kamera_okuma.py      # Hareket Algılamalı Otonom Veri Toplayıcı
+│   │   ├── kamera_okuma.py      # Hareket Algılamalı Otonom Veri Toplayıcı
+│   │   └── yolo_format_donusturucu.py # Ham Veriyi YOLO Formatına Çevirici
 │   └── benchmark.py             # FPS, Latency ve Donanım Yükü Ölçüm Scripti
 ├── donanim/                     # Mekanik Çizimler ve Devre Şemaları
 │   ├── mekanik/
-│   │   ├── servo_flap_braketi.scad    # 2020 Alüminyum Profil Servo Braketi
-│   │   └── kamera_montaj_aparati.scad # Ayarlanabilir Kamera Taşıyıcı Braket
+│   │   ├── servo_flap_braketi.scad      # 2020 Alüminyum Profil Servo Braketi
+│   │   ├── kamera_montaj_aparati.scad   # Ayarlanabilir Kamera Taşıyıcı Braket
+│   │   ├── pnomatik_manifold_montaj.scad# 5'li Solenoid Manifold Montaj Ayağı
+│   │   └── konveyor_gergi_aparati.scad  # 608zz Rulmanlı Bant Gergi Parçası
 │   └── elektronik/
-│       ├── baglanti_semasi.md   # Detaylı Pinout ve Güvenlik/Diyot Bağlantıları
-│       └── devre_semasi.svg     # Vektörel Elektriksel Bağlantı Blok Şeması
+│       ├── baglanti_semasi.md           # Detaylı Pinout ve Güvenlik/Diyot Bağlantıları
+│       ├── plc_ve_arduino_baglantisi.md # Endüstriyel PLC ve Mikrodenetleyici Seri Bağlantı
+│       └── devre_semasi.svg             # Vektörel Elektriksel Bağlantı Blok Şeması
 ├── dokumantasyon/               # Mühendislik Kılavuzları
 │   ├── BOM.md                   # 2026 Güncel Malzeme Listesi ve Maliyet Tablosu
 │   ├── KURULUM.md               # Raspberry Pi / Jetson Kurulumu ve systemd Servisleri
-│   └── KALIBRASYON_VE_TEST.md   # Konveyör Bant Hız ve Valf Zamanlama Kalibrasyonu
-├── tests/                       # Otomatik Pytest Birim ve Entegrasyon Testleri
+│   ├── KALIBRASYON_VE_TEST.md   # Konveyör Bant Hız ve Valf Zamanlama Kalibrasyonu
+│   └── CEVRESEL_ETKI_METODOLOJISI.md # EPA WARM Tabanlı Karbon ve Enerji Hesaplama Modeli
+├── tests/                       # Otomatik Pytest Birim ve Entegrasyon Testleri (16 Test)
 │   ├── test_backend_api.py
 │   ├── test_actuators.py
-│   └── test_inference.py
+│   ├── test_inference.py
+│   ├── test_multi_tracker.py
+│   ├── test_environmental.py
+│   ├── test_serial_bridge.py
+│   └── test_yolo_detector.py
 ├── Dockerfile                   # Konteyner İmajı
 ├── docker-compose.yml           # Tek Komutla Dağıtım
 └── .github/workflows/ci.yml     # Sürekli Entegrasyon (CI Pipeline)
@@ -151,8 +166,8 @@ pip install torch pytest
 cd arayuz/backend
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
-* Tarayıcınızda `http://localhost:8000/docs` adresinden API dokümantasyonuna ulaşabilirsiniz.
-* `arayuz/index.html` dosyasını tarayıcınızda açarak interaktif kontrol merkezini kullanmaya başlayın.
+* Tarayıcınızda `http://localhost:8000/docs` adresinden Swagger API dokümantasyonuna ulaşabilirsiniz.
+* `arayuz/index.html` dosyasını açarak canlı kontrol merkezini, 2D bant simülatörünü ve ESG çevresel etki panelini kullanmaya başlayın.
 
 ### 3. Edge AI Çıkarım Motorunu Çalıştırın
 Ayrı bir terminal penceresinde:
@@ -180,9 +195,9 @@ docker compose up --build
 ## 🤝 Katkıda Bulunma
 
 1. Depoyu çatallayın (Fork).
-2. Yeni bir özellik dalı açın (`git checkout -b ozellik/yeni-spektrometre-entegrasyonu`).
-3. Değişikliklerinizi commit edin (`git commit -m 'feat: AS7265x spektrometre surucusu eklendi'`).
-4. Dalınızı gönderin (`git push origin ozellik/yeni-spektrometre-entegrasyonu`).
+2. Yeni bir özellik dalı açın (`git checkout -b ozellik/yeni-algoritma`).
+3. Değişikliklerinizi commit edin (`git commit -m 'feat: yeni ozellik eklendi'`).
+4. Dalınızı gönderin (`git push origin ozellik/yeni-algoritma`).
 5. Bir Çekme İsteği (Pull Request) oluşturun.
 
 ---

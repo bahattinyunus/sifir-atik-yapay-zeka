@@ -16,7 +16,7 @@
                 <div class="logo-icon">♻️</div>
                 <div>
                     <h1>Sıfır Atık YZ</h1>
-                    <span class="sub-version">Edge-AI v2.0</span>
+                    <span class="sub-version">Edge-AI v2.5 by bahattinyunus</span>
                 </div>
             </div>
             
@@ -27,8 +27,14 @@
                 <button class="nav-item" data-tab="tab-camera">
                     <span class="nav-icon">📷</span> Canlı Kamera & Bant
                 </button>
+                <button class="nav-item" data-tab="tab-sim">
+                    <span class="nav-icon">🎮</span> Bant Simülatörü
+                </button>
                 <button class="nav-item" data-tab="tab-analytics">
                     <span class="nav-icon">📈</span> Polimer Analitiği
+                </button>
+                <button class="nav-item" data-tab="tab-eco">
+                    <span class="nav-icon">🌱</span> Çevresel Etki (ESG)
                 </button>
                 <button class="nav-item" data-tab="tab-reports">
                     <span class="nav-icon">📚</span> Atık Kayıtları & CSV
@@ -69,14 +75,13 @@
                         ⚡ Simüle Atık Gönder
                     </button>
                     <div class="user-profile">
-                        <img src="https://ui-avatars.com/api/?name=Sıfır+Atık&background=10b981&color=fff" alt="Profil">
+                        <img src="https://ui-avatars.com/api/?name=Bahattin+Yunus&background=10b981&color=fff" alt="Profil">
                     </div>
                 </div>
             </header>
 
             <!-- TAB 1: DASHBOARD -->
             <section id="tab-dashboard" class="tab-pane active">
-                <!-- Stats Grid (6 Polimer/Malzeme Türü) -->
                 <div class="stats-grid">
                     <div class="stat-card glass-panel" data-type="PET">
                         <div class="stat-icon pet">🍾</div>
@@ -128,20 +133,15 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Orta Gövde -->
                 <div class="dashboard-body">
-                    <!-- Canlı Akış Listesi -->
                     <div class="live-feed glass-panel">
                         <div class="panel-header">
                             <h3>🔴 Son Sınıflandırılan Atıklar</h3>
                             <span class="feed-counter" id="total-feed-counter">Toplam: 0</span>
                         </div>
-                        <div class="feed-list" id="feed-list">
-                            <!-- Canlı öğeler JS ile dinamik eklenecek -->
-                        </div>
+                        <div class="feed-list" id="feed-list"></div>
                     </div>
 
-                    <!-- Verimlilik ve Özet Analiz -->
                     <div class="dashboard-side">
                         <div class="efficiency-panel glass-panel">
                             <h3>⚡ Yapay Zeka Model Doğruluğu</h3>
@@ -185,36 +185,67 @@
                         </div>
                         <div class="camera-actions">
                             <button class="btn-sm" id="btn-refresh-cam">🔄 Yayını Yenile</button>
-                            <button class="btn-sm" id="btn-toggle-roi">🔲 ROI Kutusunu Göster</button>
                         </div>
                     </div>
 
                     <div class="video-wrapper">
                         <img id="live-stream-img" src="http://localhost:8000/video_feed" alt="Canlı Kamera Akışı" onerror="this.onerror=null; this.src='https://placehold.co/800x450/1e293b/f8fafc?text=Kamera+Baglantisi+Bekleniyor+(Backend+Baslatin)';">
                         <div class="video-overlay" id="video-overlay">
-                            <div class="ai-hud-tag">Edge AI Modeli: MobileNet-Polymer V2 (Quantized FP16)</div>
-                            <div class="ai-hud-inference" id="hud-inference">Inference: 14.2 ms</div>
+                            <div class="ai-hud-tag">Edge AI: PolymerEdgeNet (TorchScript 2.7ms)</div>
+                            <div class="ai-hud-inference" id="hud-inference">Inference: 2.7 ms</div>
                         </div>
                     </div>
 
                     <div class="camera-footer">
                         <div class="cam-info-pill">
-                            <span class="pill-label">Valf 1 (PET):</span> <span class="pill-status ready">Hazır</span>
+                            <span class="pill-label">Valf 1 (PET):</span> <span class="pill-status ready" id="vstatus-pet">Hazır</span>
                         </div>
                         <div class="cam-info-pill">
-                            <span class="pill-label">Valf 2 (HDPE):</span> <span class="pill-status ready">Hazır</span>
+                            <span class="pill-label">Valf 2 (HDPE):</span> <span class="pill-status ready" id="vstatus-hdpe">Hazır</span>
                         </div>
                         <div class="cam-info-pill">
-                            <span class="pill-label">Valf 3 (Naylon):</span> <span class="pill-status ready">Hazır</span>
+                            <span class="pill-label">Valf 3 (Naylon):</span> <span class="pill-status ready" id="vstatus-nylon">Hazır</span>
                         </div>
                         <div class="cam-info-pill">
-                            <span class="pill-label">Valf 4 (PUR):</span> <span class="pill-status ready">Hazır</span>
+                            <span class="pill-label">Valf 4 (PUR):</span> <span class="pill-status ready" id="vstatus-pur">Hazır</span>
+                        </div>
+                        <div class="cam-info-pill">
+                            <span class="pill-label">Valf 5 (Metal):</span> <span class="pill-status ready" id="vstatus-metal">Hazır</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 3: POLİMER ANALİTİĞİ -->
+            <!-- TAB 3: İNTERAKTİF BANT SİMÜLATÖRÜ -->
+            <section id="tab-sim" class="tab-pane">
+                <div class="sim-container glass-panel">
+                    <div class="sim-header">
+                        <div>
+                            <h3>🎮 İnteraktif Konveyör Bant & Pnömatik Valf Simülatörü</h3>
+                            <p class="subtitle">Bant üzerine manuel atık bırakabilir veya otomatik akışla valf patlatma fiziğini test edebilirsiniz.</p>
+                        </div>
+                        <div class="sim-controls-top">
+                            <button class="btn-primary" id="btn-toggle-sim-flow">▶️ Otomatik Akışı Başlat</button>
+                            <button class="btn-secondary" id="btn-clear-sim">🧹 Bandı Temizle</button>
+                        </div>
+                    </div>
+
+                    <div class="canvas-wrapper">
+                        <canvas id="conveyor-canvas" width="900" height="340"></canvas>
+                    </div>
+
+                    <div class="sim-interactive-bar">
+                        <span class="sim-bar-label">Bant Üzerine Bırak:</span>
+                        <button class="btn-sim-item btn-pet" data-drop="PET">🍾 PET Şişe</button>
+                        <button class="btn-sim-item btn-hdpe" data-drop="HDPE">🧴 HDPE Bidon</button>
+                        <button class="btn-sim-item btn-nylon" data-drop="Naylon">🧵 Naylon Parça</button>
+                        <button class="btn-sim-item btn-pur" data-drop="PUR">🧽 PUR Sünger</button>
+                        <button class="btn-sim-item btn-metal" data-drop="Metal">🥫 Alüminyum Kutu</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: POLİMER ANALİTİĞİ -->
             <section id="tab-analytics" class="tab-pane">
                 <div class="charts-grid">
                     <div class="chart-card glass-panel">
@@ -232,7 +263,71 @@
                 </div>
             </section>
 
-            <!-- TAB 4: ATIK KAYITLARI & RAPORLAR -->
+            <!-- TAB 5: ÇEVRESEL ETKİ (ESG & KARBON) -->
+            <section id="tab-eco" class="tab-pane">
+                <div class="eco-grid">
+                    <div class="eco-card glass-panel">
+                        <div class="eco-icon">⚖️</div>
+                        <div class="eco-info">
+                            <h4>Kurtarılan Plastik / Malzeme</h4>
+                            <p class="eco-value" id="eco-mass">0.0 <span class="unit">kg</span></p>
+                            <span class="eco-sub">Döngüsel ekonomiye kazandırılan</span>
+                        </div>
+                    </div>
+                    <div class="eco-card glass-panel">
+                        <div class="eco-icon">💨</div>
+                        <div class="eco-info">
+                            <h4>Önlenen Karbon Emisyonu</h4>
+                            <p class="eco-value" id="eco-co2">0.0 <span class="unit">kg CO₂</span></p>
+                            <span class="eco-sub">Doğrudan sera gazı azaltımı</span>
+                        </div>
+                    </div>
+                    <div class="eco-card glass-panel">
+                        <div class="eco-icon">🌳</div>
+                        <div class="eco-info">
+                            <h4>Eşdeğer Ağaç Kurtarma</h4>
+                            <p class="eco-value" id="eco-trees">0 <span class="unit">Ağaç / Yıl</span></p>
+                            <span class="eco-sub">Yıllık karbon yutak dengi</span>
+                        </div>
+                    </div>
+                    <div class="eco-card glass-panel">
+                        <div class="eco-icon">⚡</div>
+                        <div class="eco-info">
+                            <h4>Tasarruf Edilen Enerji</h4>
+                            <p class="eco-value" id="eco-energy">0.0 <span class="unit">kWh</span></p>
+                            <span class="eco-sub">Ham üretim yerine geri kazanım</span>
+                        </div>
+                    </div>
+                    <div class="eco-card glass-panel">
+                        <div class="eco-icon">💧</div>
+                        <div class="eco-info">
+                            <h4>Kurtarılan Temiz Su</h4>
+                            <p class="eco-value" id="eco-water">0.0 <span class="unit">Litre</span></p>
+                            <span class="eco-sub">Endüstriyel su tasarrufu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="eco-table-container glass-panel">
+                    <h3>🌱 Polimer Türü Bazında Çevresel Katkı Tablosu</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Polimer Türü</th>
+                                <th>Ayrıştırılan Adet</th>
+                                <th>Tahmini Kütle (kg)</th>
+                                <th>Önlenen CO₂ (kg)</th>
+                                <th>Enerji Tasarrufu (kWh)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eco-table-body">
+                            <tr><td colspan="5" class="loading-cell">Hesaplanıyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 6: ATIK KAYITLARI & RAPORLAR -->
             <section id="tab-reports" class="tab-pane">
                 <div class="reports-container glass-panel">
                     <div class="reports-header">
@@ -267,7 +362,7 @@
                 </div>
             </section>
 
-            <!-- TAB 5: KALİBRASYON & SİSTEM AYARLARI -->
+            <!-- TAB 7: KALİBRASYON & SİSTEM AYARLARI -->
             <section id="tab-settings" class="tab-pane">
                 <div class="settings-grid">
                     <div class="settings-card glass-panel">
@@ -331,6 +426,17 @@
                             <p>Sistem E-Stop konumuna alınmışsa aktüatörler kilitlenir. Güvenlik doğrulandıktan sonra buradan sıfırlayabilirsiniz:</p>
                             <button class="btn-secondary" id="btn-reset-estop">✅ E-Stop Sıfırla ve Devam Et</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Sistem Olay Logları Konsolu -->
+                <div class="logs-container glass-panel" style="margin-top: 1.5rem; padding: 1.5rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h3>📋 Sistem Olay ve Güvenlik Günlüğü</h3>
+                        <button class="btn-sm" id="btn-refresh-logs">🔄 Logları Yenile</button>
+                    </div>
+                    <div class="logs-scroll" id="system-logs-box" style="max-height: 220px; overflow-y:auto; font-family:monospace; font-size:0.8rem; background:rgba(0,0,0,0.3); padding:0.75rem; border-radius:8px;">
+                        <div>Loglar yükleniyor...</div>
                     </div>
                 </div>
             </section>

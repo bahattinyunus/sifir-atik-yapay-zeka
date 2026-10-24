@@ -1,6 +1,7 @@
 /**
- * Sıfır Atık YZ - Akıllı Kontrol Paneli v2.0
- * Gerçek zamanlı WebSocket iletişimi, interaktif grafikler ve sistem yönetimi.
+ * Sıfır Atık YZ - Akıllı Kontrol Paneli v2.5 by bahattinyunus
+ * Gerçek zamanlı WebSocket iletişimi, Chart.js analitiği, ESG çevresel etki hesaplayıcı
+ * ve interaktif 2D HTML5 Canvas konveyör bant simülatörü.
  */
 
 // API Temel Adresi
@@ -11,12 +12,12 @@ const WS_URL = API_BASE.replace('http', 'ws') + '/ws';
 
 // Malzeme ve Polimer Tanımlamaları
 const wasteTypesConfig = {
-    'PET': { name: 'PET Şişe / Levha', class: 'pet', icon: '🍾' },
-    'HDPE': { name: 'HDPE Bidon / Kapak', class: 'hdpe', icon: '🧴' },
-    'Naylon': { name: 'Naylon (Poliamid)', class: 'nylon', icon: '🧵' },
-    'PUR': { name: 'PUR (Poliüretan)', class: 'pur', icon: '🧽' },
-    'Metal': { name: 'Alüminyum / Metal', class: 'metal', icon: '🥫' },
-    'Reject': { name: 'Tanımlanamayan / Diğer', class: 'reject', icon: '🗑️' }
+    'PET': { name: 'PET Şişe / Levha', class: 'pet', icon: '🍾', color: '#38bdf8', valveIdx: 1, valveX: 340 },
+    'HDPE': { name: 'HDPE Bidon / Kapak', class: 'hdpe', icon: '🧴', color: '#f59e0b', valveIdx: 2, valveX: 460 },
+    'Naylon': { name: 'Naylon (Poliamid)', class: 'nylon', icon: '🧵', color: '#c084fc', valveIdx: 3, valveX: 580 },
+    'PUR': { name: 'PUR (Poliüretan)', class: 'pur', icon: '🧽', color: '#2dd4bf', valveIdx: 4, valveX: 700 },
+    'Metal': { name: 'Alüminyum / Metal', class: 'metal', icon: '🥫', color: '#94a3b8', valveIdx: 5, valveX: 820 },
+    'Reject': { name: 'Tanımlanamayan / Diğer', class: 'reject', icon: '🗑️', color: '#ef4444', valveIdx: 0, valveX: 890 }
 };
 
 // Global Durum
@@ -41,7 +42,9 @@ function initTabs() {
     const titles = {
         'tab-dashboard': 'Sistem Kontrol Merkezi (Genel Bakış)',
         'tab-camera': 'Canlı Konveyör Bant ve Görsel Yapay Zeka',
+        'tab-sim': 'İnteraktif Konveyör Bant & Valf Simülatörü',
         'tab-analytics': 'Polimer Sınıflandırma ve Veri Analitiği',
+        'tab-eco': 'Çevresel Etki Analitiği (ESG & Karbon Tasarrufu)',
         'tab-reports': 'Atık Kayıt Kütüğü ve Denetim (Audit Log)',
         'tab-settings': 'Sistem Kalibrasyonu ve Donanım Parametreleri'
     };
@@ -63,7 +66,11 @@ function initTabs() {
             // Sekme açıldığında ilgili veriyi güncelle
             if (targetId === 'tab-reports') loadHistoryData();
             if (targetId === 'tab-analytics') fetchStatsAndRefreshCharts();
-            if (targetId === 'tab-settings') loadSettingsAndHealth();
+            if (targetId === 'tab-eco') loadEcoImpactData();
+            if (targetId === 'tab-settings') {
+                loadSettingsAndHealth();
+                loadSystemLogs();
+            }
         });
     });
 }
@@ -113,7 +120,6 @@ function connectWebSocket() {
     ws.onclose = () => {
         if (pulse) pulse.className = "pulse-dot";
         if (statusText) statusText.innerText = "Bağlantı Bekleniyor...";
-        console.log("WebSocket koptu. 3 saniye sonra yeniden deneniyor...");
         clearTimeout(reconnectTimer);
         reconnectTimer = setTimeout(connectWebSocket, 3000);
     };
@@ -130,7 +136,15 @@ function handleIncomingMessage(msg) {
     } else if (msg.event === 'detection') {
         addLiveFeedItem(msg);
         if (msg.stats) updateStatsState(msg.stats);
-        // Canlı kameradaki HUD çıkarım süresini güncelle
+        
+        // Simülatör açıksa nesne oluştur
+        if (simulator) {
+            simulator.spawnItem(msg.type, msg.confidence);
+        }
+
+        // Valf göstergelerini anlık tetikle
+        triggerValvePillAnimation(msg.type);
+
         const hudInf = document.getElementById('hud-inference');
         if (hudInf && msg.inference_ms) {
             hudInf.innerText = `Inference: ${msg.inference_ms} ms`;
@@ -152,6 +166,30 @@ function handleIncomingMessage(msg) {
             badge.style.background = "rgba(16, 185, 129, 0.15)";
             badge.style.borderColor = "rgba(16, 185, 129, 0.3)";
             badge.style.color = "var(--accent)";
+        }
+    }
+}
+
+function triggerValvePillAnimation(wasteType) {
+    const map = {
+        'PET': 'vstatus-pet',
+        'HDPE': 'vstatus-hdpe',
+        'Naylon': 'vstatus-nylon',
+        'PUR': 'vstatus-pur',
+        'Metal': 'vstatus-metal'
+    };
+    const id = map[wasteType];
+    if (id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerText = "Ateşlendi! (120ms)";
+            el.style.color = "#38bdf8";
+            el.style.fontWeight = "bold";
+            setTimeout(() => {
+                el.innerText = "Hazır";
+                el.style.color = "var(--accent)";
+                el.style.fontWeight = "600";
+            }, 600);
         }
     }
 }
@@ -191,7 +229,6 @@ function updateStatsState(newStats) {
         circle.style.background = `conic-gradient(var(--accent) ${deg}deg, rgba(255, 255, 255, 0.08) 0deg)`;
     }
 
-    // Grafikleri güncelle
     updateDoughnutChart();
 }
 
@@ -220,7 +257,6 @@ function addLiveFeedItem(data) {
 
     feedList.insertBefore(item, feedList.firstChild);
 
-    // Listede en fazla 7 öğe tut
     if (feedList.children.length > 7) {
         feedList.removeChild(feedList.lastChild);
     }
@@ -314,7 +350,6 @@ async function fetchStatsAndRefreshCharts() {
             const data = await res.json();
             if (data.summary) updateStatsState(data.summary);
             if (data.hourly_breakdown && hourlyChart) {
-                // Saatlik dökümü grafiğe işle
                 const hours = [...new Set(data.hourly_breakdown.map(h => h.hour))];
                 if (hours.length > 0) {
                     hourlyChart.data.labels = hours;
@@ -324,6 +359,64 @@ async function fetchStatsAndRefreshCharts() {
         }
     } catch (e) {
         console.warn("Grafik verileri alınamadı:", e);
+    }
+}
+
+// ===================== ÇEVRESEL ETKİ (ESG) =====================
+async function loadEcoImpactData() {
+    try {
+        const res = await fetch(`${API_BASE}/api/environmental-impact`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById('eco-mass').innerHTML = `${data.total_mass_kg} <span class="unit">kg</span>`;
+        document.getElementById('eco-co2').innerHTML = `${data.total_co2_saved_kg} <span class="unit">kg CO₂</span>`;
+        document.getElementById('eco-trees').innerHTML = `${data.equivalent_trees_saved} <span class="unit">Ağaç / Yıl</span>`;
+        document.getElementById('eco-energy').innerHTML = `${data.total_energy_saved_kwh} <span class="unit">kWh</span>`;
+        document.getElementById('eco-water').innerHTML = `${data.total_water_saved_liters} <span class="unit">Litre</span>`;
+
+        const tbody = document.getElementById('eco-table-body');
+        if (tbody && data.by_polymer) {
+            tbody.innerHTML = Object.entries(data.by_polymer).map(([poly, info]) => {
+                const cfg = wasteTypesConfig[poly] || wasteTypesConfig['Reject'];
+                return `
+                    <tr>
+                        <td><span class="badge ${cfg.class}">${cfg.icon} ${poly}</span></td>
+                        <td>${info.count.toLocaleString('tr-TR')} adet</td>
+                        <td><strong>${info.mass_kg} kg</strong></td>
+                        <td style="color:var(--accent)"><strong>-${info.co2_saved_kg} kg CO₂</strong></td>
+                        <td>${info.energy_saved_kwh} kWh</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    } catch (e) {
+        console.warn("Çevresel veri alınamadı:", e);
+    }
+}
+
+// ===================== SİSTEM LOGLARI =====================
+async function loadSystemLogs() {
+    const box = document.getElementById('system-logs-box');
+    if (!box) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/logs?limit=25`);
+        if (!res.ok) return;
+        const logs = await res.json();
+        if (logs.length === 0) {
+            box.innerHTML = '<div>Henüz sistem logu bulunmuyor.</div>';
+            return;
+        }
+        box.innerHTML = logs.map(l => {
+            const color = l.level === 'WARNING' ? '#ef4444' : (l.level === 'CONFIG' ? '#38bdf8' : '#10b981');
+            return `<div style="margin-bottom: 0.35rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.25rem;">
+                <span style="color:var(--text-muted)">[${l.timestamp}]</span>
+                <span style="color:${color}; font-weight:bold;">[${l.level}]</span>
+                <span>${l.message}</span>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        box.innerHTML = `<div style="color:#ef4444">Loglar yüklenemedi: ${e.message}</div>`;
     }
 }
 
@@ -351,7 +444,7 @@ async function loadHistoryData() {
                     <td><span class="badge ${cfg.class}">${cfg.icon} ${item.waste_type}</span></td>
                     <td><strong>%${Number(item.confidence).toFixed(1)}</strong></td>
                     <td>${item.timestamp} <small style="color:var(--text-muted)">(${item.created_at || ''})</small></td>
-                    <td>${item.inference_ms || 14.5} ms</td>
+                    <td>${item.inference_ms || 2.7} ms</td>
                     <td>${item.actuated ? '<span style="color:#10b981">Ayrıştırıldı (Valf)</span>' : '<span style="color:#ef4444">Pas Geçildi</span>'}</td>
                     <td><code>${item.source || 'edge'}</code></td>
                 </tr>
@@ -386,7 +479,6 @@ async function loadSettingsAndHealth() {
             document.getElementById('sys-uptime').innerText = h.uptime_formatted;
             document.getElementById('sys-ws').innerText = `${h.active_ws_clients} Aktif İstemci`;
 
-            // Mini metrikler
             const mCpu = document.getElementById('mini-cpu');
             const mRam = document.getElementById('mini-ram');
             if (mCpu) mCpu.innerText = `%${h.cpu_usage_pct}`;
@@ -397,9 +489,275 @@ async function loadSettingsAndHealth() {
     }
 }
 
+// ===================== İNTERAKTİF 2D KONVEYÖR BANT SİMÜLATÖRÜ =====================
+class ConveyorSimulator {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) return;
+        this.ctx = this.canvas.getContext('2d');
+        this.items = [];
+        this.particles = [];
+        this.speed = 2.4;
+        this.autoFlow = false;
+        this.autoTimer = null;
+        this.beltOffset = 0;
+
+        this.valves = [
+            { type: 'PET', name: 'Valf 1 (PET)', x: 340, color: '#38bdf8' },
+            { type: 'HDPE', name: 'Valf 2 (HDPE)', x: 460, color: '#f59e0b' },
+            { type: 'Naylon', name: 'Valf 3 (Naylon)', x: 580, color: '#c084fc' },
+            { type: 'PUR', name: 'Valf 4 (PUR)', x: 700, color: '#2dd4bf' },
+            { type: 'Metal', name: 'Valf 5 (Metal)', x: 820, color: '#94a3b8' }
+        ];
+
+        this.animate = this.animate.bind(this);
+        requestAnimationFrame(this.animate);
+    }
+
+    spawnItem(type = 'PET', confidence = 96.5) {
+        const item = {
+            id: Date.now() + Math.random(),
+            type: type,
+            confidence: confidence,
+            x: 20,
+            y: 130,
+            width: 38,
+            height: 38,
+            detected: false,
+            falling: false,
+            fallVy: 0,
+            active: true
+        };
+        this.items.push(item);
+    }
+
+    triggerAirBlast(x, color) {
+        for (let i = 0; i < 24; i++) {
+            this.particles.push({
+                x: x + (Math.random() * 20 - 10),
+                y: 100 + Math.random() * 10,
+                vx: (Math.random() - 0.5) * 2.5,
+                vy: Math.random() * 6 + 4,
+                life: 1.0,
+                color: color
+            });
+        }
+    }
+
+    animate() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(this.animate);
+    }
+
+    update() {
+        this.beltOffset = (this.beltOffset + this.speed) % 30;
+
+        for (let item of this.items) {
+            if (!item.active) continue;
+
+            if (!item.falling) {
+                item.x += this.speed;
+
+                // Kamera Algılama Alanı (x = 180 - 240)
+                if (item.x > 180 && !item.detected) {
+                    item.detected = true;
+                }
+
+                // İlgili Valf Nozulu Kontrolü
+                for (let v of this.valves) {
+                    if (item.type === v.type && Math.abs(item.x - v.x) < 8) {
+                        item.falling = true;
+                        this.triggerAirBlast(v.x, v.color);
+                        break;
+                    }
+                }
+
+                // Reject atıklar bant sonundan düşer
+                if (item.x > 875) {
+                    item.falling = true;
+                }
+            } else {
+                // Aşağı düşme fiziği
+                item.fallVy += 0.45;
+                item.y += item.fallVy;
+                if (item.y > 330) {
+                    item.active = false;
+                }
+            }
+        }
+
+        // Parçacık fiziği
+        for (let p of this.particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.04;
+        }
+        this.particles = this.particles.filter(p => p.life > 0);
+        this.items = this.items.filter(item => item.active);
+    }
+
+    draw() {
+        const ctx = this.ctx;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // 1. Konveyör Bant Çerçevesi
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 115, w, 70);
+
+        // Bant Şeritleri
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        for (let x = -30 + this.beltOffset; x < w; x += 30) {
+            ctx.beginPath();
+            ctx.moveTo(x, 115);
+            ctx.lineTo(x + 15, 185);
+            ctx.stroke();
+        }
+
+        // Bant Kenarlıkları
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, 115); ctx.lineTo(w, 115);
+        ctx.moveTo(0, 185); ctx.lineTo(w, 185);
+        ctx.stroke();
+
+        // 2. Kamera & AI Algılama Alanı (ROI)
+        ctx.strokeStyle = '#10b981';
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(170, 95, 100, 100);
+        ctx.fillRect(170, 95, 100, 100);
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#10b981';
+        ctx.font = '11px Inter, monospace';
+        ctx.fillText('📷 AI ZONE (ROI)', 175, 88);
+
+        // 3. Pnömatik Solenoid Valfler ve Nozullar
+        for (let v of this.valves) {
+            // Nozul başlığı
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(v.x - 8, 92, 16, 18);
+            ctx.fillStyle = v.color;
+            ctx.beginPath();
+            ctx.arc(v.x, 110, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Etiket
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(v.type, v.x, 82);
+
+            // Alt Hazne (Toplama Kutusu)
+            ctx.strokeStyle = v.color;
+            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(v.x - 22, 230, 44, 80);
+            ctx.fillRect(v.x - 22, 230, 44, 80);
+            ctx.fillStyle = v.color;
+            ctx.fillText('📦 ' + v.type, v.x, 260);
+        }
+
+        // Bant Sonu Reject Haznesi
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#ef4444';
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.05)';
+        ctx.strokeRect(865, 230, 32, 80);
+        ctx.fillRect(865, 230, 32, 80);
+        ctx.fillStyle = '#ef4444';
+        ctx.fillText('🗑️', 881, 260);
+
+        // 4. Parçacıklar (Hava Püskürtme Efekti)
+        for (let p of this.particles) {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+
+        // 5. Atık Nesneleri
+        for (let item of this.items) {
+            const cfg = wasteTypesConfig[item.type] || wasteTypesConfig['Reject'];
+            ctx.fillStyle = cfg.color;
+            ctx.fillRect(item.x - 16, item.y - 16, 32, 32);
+
+            // Bounding Box
+            if (item.detected && !item.falling) {
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(item.x - 20, item.y - 20, 40, 40);
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(`%${item.confidence.toFixed(0)}`, item.x, item.y - 24);
+            }
+
+            // İkon
+            ctx.font = '16px Inter';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(cfg.icon, item.x, item.y);
+        }
+        ctx.textBaseline = 'alphabetic';
+        ctx.textAlign = 'start';
+    }
+
+    toggleAutoFlow(btn) {
+        this.autoFlow = !this.autoFlow;
+        if (this.autoFlow) {
+            btn.innerText = "⏸️ Akışı Durdur";
+            btn.style.background = "#f59e0b";
+            this.autoTimer = setInterval(() => {
+                const types = ['PET', 'HDPE', 'Naylon', 'PUR', 'Metal'];
+                const randType = types[Math.floor(Math.random() * types.length)];
+                const conf = 88.0 + Math.random() * 11.5;
+                this.spawnItem(randType, conf);
+            }, 1800);
+        } else {
+            btn.innerText = "▶️ Otomatik Akışı Başlat";
+            btn.style.background = "var(--accent)";
+            clearInterval(this.autoTimer);
+        }
+    }
+
+    clear() {
+        this.items = [];
+        this.particles = [];
+    }
+}
+
+let simulator = null;
+
 // ===================== BUTON ETKİLEŞİMLERİ =====================
 function initEventHandlers() {
-    // Hızlı Simülasyon
+    // Simülatör Tuşları
+    const btnFlow = document.getElementById('btn-toggle-sim-flow');
+    if (btnFlow && simulator) {
+        btnFlow.addEventListener('click', () => simulator.toggleAutoFlow(btnFlow));
+    }
+
+    const btnClearSim = document.getElementById('btn-clear-sim');
+    if (btnClearSim && simulator) {
+        btnClearSim.addEventListener('click', () => simulator.clear());
+    }
+
+    document.querySelectorAll('.btn-sim-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.getAttribute('data-drop');
+            if (simulator) simulator.spawnItem(type, 97.4);
+            showToast(`Bant üzerine ${type} atığı bırakıldı.`);
+        });
+    });
+
+    // Hızlı Simülasyon (Backend'e)
     const btnSim = document.getElementById('btn-quick-sim');
     if (btnSim) {
         btnSim.addEventListener('click', async () => {
@@ -437,6 +795,10 @@ function initEventHandlers() {
     // Rapor Listesini Yenile
     const btnRefHist = document.getElementById('btn-refresh-history');
     if (btnRefHist) btnRefHist.addEventListener('click', loadHistoryData);
+
+    // Logları Yenile
+    const btnRefLogs = document.getElementById('btn-refresh-logs');
+    if (btnRefLogs) btnRefLogs.addEventListener('click', loadSystemLogs);
 
     // Ayarları Kaydet Formu
     const formSettings = document.getElementById('settings-form');
@@ -508,7 +870,7 @@ function initEventHandlers() {
     }
 }
 
-// Periyodik Donanım Durumu ve İstatistik Polling
+// Periyodik Polling
 setInterval(() => {
     loadSettingsAndHealth();
 }, 10000);
@@ -517,8 +879,10 @@ setInterval(() => {
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initCharts();
+    simulator = new ConveyorSimulator('conveyor-canvas');
     initEventHandlers();
     connectWebSocket();
     fetchStatsAndRefreshCharts();
     loadSettingsAndHealth();
+    loadEcoImpactData();
 });
